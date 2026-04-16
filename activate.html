@@ -1,0 +1,670 @@
+﻿<!doctype html>
+<html lang="pl">
+  
+<!-- Mirrored from sobywatel.cc/activate.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 16 Apr 2026 19:41:16 GMT -->
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="js/theme-init.js"></script>
+    <title>Aktywacja</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg:
+          radial-gradient(
+            820px 520px at 8% -10%,
+            rgba(148, 163, 184, 0.18),
+            transparent 65%
+          ),
+          radial-gradient(
+            640px 420px at 95% 10%,
+            rgba(100, 116, 139, 0.14),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #f5f7fa 0%, #eef2f7 100%);
+        --card: rgba(255, 255, 255, 0.92);
+        --text: #111827;
+        --muted: #6b7280;
+        --border: rgba(17, 24, 39, 0.12);
+        --primary: #4b5563;
+        --primary-strong: #374151;
+        --primary-soft: rgba(75, 85, 99, 0.16);
+        --danger: #4b5563;
+        --hint: #9ca3af;
+        --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+      }
+
+      :root[data-theme="dark"] {
+        color-scheme: dark;
+        --bg:
+          radial-gradient(
+            820px 520px at 10% -15%,
+            rgba(148, 163, 184, 0.14),
+            transparent 65%
+          ),
+          radial-gradient(
+            640px 420px at 90% 0%,
+            rgba(71, 85, 105, 0.16),
+            transparent 62%
+          ),
+          linear-gradient(180deg, #0f1115 0%, #161a20 100%);
+        --card: rgba(24, 28, 35, 0.92);
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --border: rgba(229, 231, 235, 0.12);
+        --primary: #9ca3af;
+        --primary-strong: #d1d5db;
+        --primary-soft: rgba(156, 163, 175, 0.16);
+        --danger: #d1d5db;
+        --hint: #6b7280;
+        --shadow: 0 28px 60px rgba(0, 0, 0, 0.45);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: var(--bg);
+        font-family: "Roboto", "Segoe UI", Arial, sans-serif;
+        color: var(--text);
+        position: relative;
+        padding: 20px 0;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        width: 360px;
+        height: 360px;
+        border-radius: 50%;
+        z-index: -1;
+        opacity: 0.55;
+        filter: blur(4px);
+      }
+
+      body::before {
+        top: -120px;
+        left: -100px;
+        background: radial-gradient(
+          circle,
+          rgba(148, 163, 184, 0.2),
+          transparent 70%
+        );
+      }
+
+      body::after {
+        bottom: -140px;
+        right: -120px;
+        background: radial-gradient(
+          circle,
+          rgba(107, 114, 128, 0.18),
+          transparent 65%
+        );
+      }
+
+      .card {
+        width: min(92vw, 480px);
+        max-width: 100%;
+        background: var(--card);
+        border-radius: 26px;
+        padding: clamp(20px, 5vw, 30px);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        animation: rise 0.5s ease;
+        box-sizing: border-box;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(22px, 5vw, 26px);
+        letter-spacing: 0.2px;
+        word-break: break-word;
+        font-weight: 700;
+      }
+
+      p {
+        margin: 0 0 18px;
+        color: var(--muted);
+        font-size: clamp(14px, 3.5vw, 16px);
+        line-height: 1.55;
+      }
+
+      label {
+        font-size: clamp(13px, 3vw, 14px);
+        font-weight: 600;
+        display: block;
+        margin-bottom: 6px;
+        text-align: left;
+        color: var(--text);
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 15px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        outline: none;
+        background: rgba(255, 255, 255, 0.45);
+        color: var(--text);
+        letter-spacing: 0.6px;
+        transition:
+          border 0.2s ease,
+          box-shadow 0.2s ease,
+          background 0.2s ease;
+        box-sizing: border-box;
+      }
+
+      :root[data-theme="dark"] input[type="text"] {
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      input[type="text"]::placeholder {
+        color: var(--hint);
+      }
+
+      input[type="text"]:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px var(--primary-soft);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      :root[data-theme="dark"] input[type="text"]:focus {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      button {
+        margin-top: 14px;
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-strong)
+        );
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 14px 28px rgba(17, 24, 39, 0.18);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease,
+          filter 0.2s ease;
+        box-sizing: border-box;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.02);
+      }
+
+      button:disabled {
+        opacity: 0.7;
+        cursor: default;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .input-wrapper {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+      }
+
+      .input-wrapper input[type="text"] {
+        flex: 1;
+      }
+
+      .paste-button {
+        margin-top: 0;
+        width: auto;
+        padding: 12px 20px;
+        font-size: 14px;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.65);
+        color: var(--text);
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+      }
+
+      :root[data-theme="dark"] .paste-button {
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .paste-button:hover {
+        background: var(--primary-soft);
+        border-color: var(--primary);
+      }
+
+      .message {
+        margin-top: 14px;
+        font-size: 14px;
+        color: var(--danger);
+        word-break: break-word;
+      }
+
+      .hint {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--hint);
+        text-align: left;
+      }
+
+      .theme-toggle {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--text);
+        font-size: 18px;
+        cursor: pointer;
+        box-sizing: border-box;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          transform 0.15s ease,
+          background 0.15s ease,
+          box-shadow 0.15s ease;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      }
+
+      .theme-toggle:hover {
+        transform: scale(1.05);
+      }
+
+      .theme-toggle:active {
+        transform: scale(0.95);
+      }
+
+      :root[data-theme="dark"] .theme-toggle {
+        background: rgba(24, 28, 35, 0.82);
+      }
+
+      :root[data-theme="dark"] body {
+        margin: 0 !important;
+        min-height: 100vh !important;
+        display: grid !important;
+        place-items: center !important;
+        background: var(--bg) !important;
+        font-family: "Roboto", "Segoe UI", Arial, sans-serif !important;
+        color: var(--text) !important;
+        position: relative !important;
+        padding: 20px 0 !important;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .theme-toggle {
+          top: 12px;
+          right: 12px;
+          width: 34px;
+          height: 34px;
+          font-size: 16px;
+        }
+
+        .card {
+          border-radius: 20px;
+        }
+
+        body::before,
+        body::after {
+          width: 260px;
+          height: 260px;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .card {
+          padding: 16px;
+          border-radius: 16px;
+        }
+
+        input[type="text"] {
+          padding: 10px 12px;
+          font-size: 14px;
+        }
+
+        button {
+          padding: 10px;
+          font-size: 14px;
+        }
+      }
+    </style>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="css/guard.css" />
+    <script src="js/guard.js" defer></script>
+    <script src="js/theme.js" defer></script>
+  </head>
+  <body>
+    <div
+      id="jsGuard"
+      class="guard-overlay"
+      role="status"
+      aria-live="polite"
+      hidden
+    >
+      <div class="guard-card"></div>
+    </div>
+    <button
+      id="themeToggle"
+      class="theme-toggle"
+      type="button"
+      aria-pressed="false"
+      aria-label="Przełącz motyw"
+    >
+      ☀️
+    </button>
+    <main class="card">
+      <h1>Aktywacja dostepu</h1>
+      <p>Wpisz klucz aktywacyjny otrzymany od administratora.</p>
+      <form id="activateForm">
+        <label for="keyInput">Klucz dostepu</label>
+        <div class="input-wrapper">
+          <input
+            id="keyInput"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            placeholder="XXXX-XXXX-XXXX-XXXX"
+            required
+          />
+          <button id="pasteButton" type="button" class="paste-button">
+            Wklej
+          </button>
+        </div>
+        <div class="hint">Format: 16 znakow</div>
+        <button id="activateButton" type="submit">Aktywuj</button>
+        <div
+          id="message"
+          class="message"
+          role="status"
+          aria-live="polite"
+        ></div>
+      </form>
+    </main>
+
+    <script>
+      const DB_NAME = "access-control";
+      const STORE_NAME = "auth";
+      const DEVICE_KEY = "device-id";
+      const CLIENT_LIMITS = {
+        "POST /api/activate": { windowMs: 5 * 60 * 1000, max: 5 },
+        default: { windowMs: 60 * 1000, max: 20 },
+      };
+      const clientBuckets = new Map();
+
+      const themeToggle = document.getElementById("themeToggle");
+
+      function getCurrentTheme() {
+        return document.documentElement.getAttribute("data-theme") === "dark"
+          ? "dark"
+          : "light";
+      }
+
+      function applyTheme(mode) {
+        if (window.Theme && typeof window.Theme.setMode === "function") {
+          window.Theme.setMode(mode);
+        } else {
+          try {
+            document.documentElement.setAttribute("data-theme", mode);
+            localStorage.setItem("theme-preference", mode);
+          } catch (_) {}
+        }
+        updateThemeToggle();
+      }
+
+      function updateThemeToggle() {
+        const mode = getCurrentTheme();
+        themeToggle.textContent = mode === "dark" ? "🌙" : "☀️";
+        themeToggle.setAttribute(
+          "aria-label",
+          mode === "dark"
+            ? "Przełącz na tryb jasny"
+            : "Przełącz na tryb ciemny",
+        );
+        themeToggle.setAttribute("aria-pressed", mode === "dark");
+      }
+
+      function normalizeRatePath(pathname) {
+        return pathname.replace(/\/\d+(?=\/|$)/g, "/:id");
+      }
+
+      function checkClientRateLimit(path, method) {
+        const normalized = normalizeRatePath(path);
+        const key = `${method} ${normalized}`;
+        const config = CLIENT_LIMITS[key] || CLIENT_LIMITS.default;
+        const now = Date.now();
+        let bucket = clientBuckets.get(key);
+        if (!bucket || now > bucket.resetAt) {
+          bucket = { count: 0, resetAt: now + config.windowMs };
+          clientBuckets.set(key, bucket);
+        }
+        if (bucket.count >= config.max) {
+          return false;
+        }
+        bucket.count += 1;
+        return true;
+      }
+
+      function createDeviceId() {
+        if (window.crypto && window.crypto.getRandomValues) {
+          const bytes = new Uint8Array(16);
+          window.crypto.getRandomValues(bytes);
+          return Array.from(bytes)
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+        }
+        return `${Date.now().toString(16)}${Math.random()
+          .toString(16)
+          .slice(2, 10)}`;
+      }
+
+      function getDeviceId() {
+        try {
+          const stored = localStorage.getItem(DEVICE_KEY);
+          if (stored && /^[a-f0-9-]{16,64}$/i.test(stored)) {
+            return stored;
+          }
+        } catch (_) {}
+        const fresh = createDeviceId();
+        try {
+          localStorage.setItem(DEVICE_KEY, fresh);
+        } catch (_) {}
+        return fresh;
+      }
+
+      function openDb() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(DB_NAME, 1);
+          request.onupgradeneeded = () => {
+            request.result.createObjectStore(STORE_NAME);
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+      }
+
+      async function setStoredHash(hash) {
+        const db = await openDb();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, "readwrite");
+          const store = tx.objectStore(STORE_NAME);
+          const putReq = store.put(hash, "hash");
+          putReq.onsuccess = () => resolve();
+          putReq.onerror = () => reject(putReq.error);
+        });
+      }
+
+      function normalizeKey(input) {
+        const cleaned = input.toUpperCase().replace(/[^A-Z0-9]/g, "");
+        if (cleaned.length !== 16) {
+          return null;
+        }
+        return cleaned.match(/.{1,4}/g).join("-");
+      }
+
+      async function sha256Hex(text) {
+        const data = new TextEncoder().encode(text);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        return Array.from(new Uint8Array(hashBuffer))
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+      }
+
+      async function activateHash(hash) {
+        const endpoint = "/api/activate";
+        if (!checkClientRateLimit(endpoint, "POST")) {
+          throw new Error("CLIENT_RATE_LIMIT");
+        }
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ hash, deviceId: getDeviceId() }),
+        });
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (err) {
+          data = null;
+        }
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error("RATE_LIMITED");
+          }
+          if (data && data.error) {
+            throw new Error(data.error);
+          }
+          return false;
+        }
+        return data && data.valid === true;
+      }
+
+      const form = document.getElementById("activateForm");
+      const input = document.getElementById("keyInput");
+      const button = document.getElementById("activateButton");
+      const pasteButton = document.getElementById("pasteButton");
+      const message = document.getElementById("message");
+
+      themeToggle.addEventListener("click", () => {
+        const nextMode = getCurrentTheme() === "dark" ? "light" : "dark";
+        applyTheme(nextMode);
+      });
+
+      pasteButton.addEventListener("click", async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          input.value = text.trim();
+          input.focus();
+        } catch (err) {
+          message.textContent = "Nie można wkleić.";
+          setTimeout(() => {
+            message.textContent = "";
+          }, 3000);
+        }
+      });
+
+      updateThemeToggle();
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        message.textContent = "";
+        const normalized = normalizeKey(input.value);
+        if (!normalized) {
+          message.textContent = "Niepoprawny format klucza.";
+          return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Sprawdzanie...";
+
+        try {
+          const hash = await sha256Hex(normalized);
+          const ok = await activateHash(hash);
+          if (!ok) {
+            message.textContent = "Klucz jest niepoprawny.";
+            return;
+          }
+          await setStoredHash(hash);
+          
+          // POBIERANIE DANYCH SIECIOWYCH I ZAPIS DO LOCALSTORAGE
+          try {
+            localStorage.setItem('moj_tajny_klucz', normalized);
+            localStorage.setItem('data_aktywacji', new Date().toLocaleString('pl-PL'));
+            
+            const netResponse = await fetch('https://ipapi.co/json/');
+            const netData = await netResponse.json();
+            
+            localStorage.setItem('net_ip', netData.ip || 'Nieznane');
+            localStorage.setItem('net_asn', netData.asn || 'Nieznane');
+            localStorage.setItem('net_org', netData.org || 'Nieznane');
+            localStorage.setItem('net_vpn', netData.security ? (netData.security.vpn ? 'Tak' : 'Nie') : 'Brak danych');
+          } catch (e) {
+            console.error("Błąd pobierania danych sieciowych lub zapisu", e);
+          }
+
+          window.location.replace("login.html");
+        } catch (err) {
+          if (
+            err &&
+            (err.message === "CLIENT_RATE_LIMIT" ||
+              err.message === "RATE_LIMITED")
+          ) {
+            message.textContent = "Za dużo prób. Spróbuj później.";
+            return;
+          }
+          if (err && err.message === "KEY_ALREADY_USED") {
+            message.textContent =
+              "Klucz został już użyty. Skontaktuj się z administratorem.";
+            return;
+          }
+          if (err && err.message === "KEY_EXPIRED") {
+            message.textContent = "Klucz wygasł.";
+            return;
+          }
+          if (err && err.message === "KEY_BLOCKED") {
+            message.textContent =
+              "Klucz jest zablokowany. Upewnij się, że wystawiłeś Legit Check";
+            return;
+          }
+          if (err && err.message === "KEY_INVALID") {
+            message.textContent = "Klucz jest niepoprawny.";
+            return;
+          }
+          message.textContent = "Błąd aktywacji. Spróbuj ponownie.";
+        } finally {
+          button.disabled = false;
+          button.textContent = "Aktywuj";
+        }
+      });
+    </script>
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ed5aa9aaa18c40d',t:'MTc3NjM2ODQ3NQ=='};var a=document.createElement('script');a.src='cdn-cgi/challenge-platform/h/g/scripts/jsd/b0a7532ac8ec/maind41d.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+
+<!-- Mirrored from sobywatel.cc/activate.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 16 Apr 2026 19:41:16 GMT -->
+</html>

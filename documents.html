@@ -1,0 +1,459 @@
+﻿<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <title>sObywatel 4.0</title>
+    <script src="js/theme-init.js"></script>
+
+    <link rel="preload" href="css/main.css" as="style" />
+    <link rel="preload" href="css/common.css" as="style" />
+    <link rel="preload" href="css/pages/documents.css" as="style" />
+    <link
+      rel="preload"
+      href="assets/fonts/roboto_500_latin.woff2"
+      as="font"
+      type="font/woff2"
+    />
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="icon.png" />
+    <link rel="manifest" href="manifest.json" />
+
+    <link rel="stylesheet" href="css/main.css" data-n-g />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/pages/documents.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/guard.css" />
+    
+    <script src="js/theme.js" defer></script>
+    <script src="js/header.js" defer></script>
+    <script src="js/navigation.js" defer></script>
+    <script src="js/pages/documents.js" defer></script>
+
+    <style>
+      .custom-modal {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .custom-modal-backdrop {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      .custom-modal-content {
+        position: relative;
+        background: #fff;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        text-align: center;
+        z-index: 10000;
+        width: 80%;
+        max-width: 320px;
+        font-family: sans-serif;
+      }
+      .custom-modal-content h3 {
+        margin-top: 0;
+        color: #333;
+      }
+      .custom-modal-content p {
+        font-size: 16px;
+        margin: 15px 0 25px 0;
+        color: #555;
+      }
+      .modal-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .custom-modal-btn {
+        background-color: #cd291c;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+      }
+      .custom-modal-btn-secondary {
+        background-color: transparent;
+        color: #555;
+        border: 1px solid #ccc;
+      }
+    </style>
+  </head>
+
+  <body class="dashboard-page">
+    <div
+      id="jsGuard"
+      class="guard-overlay"
+      role="status"
+      aria-live="polite"
+      hidden
+    >
+      <div class="guard-card"></div>
+    </div>
+    <header class="app-header dashboard-header">
+      <div class="header-left">
+        <div id="inicjaly1">
+          <img
+            id="logo-img"
+            src="assets/icons/coi_common_ui_ic_mobywatel_logo.svg"
+            alt="mObywatel"
+          />
+        </div>
+        <span id="header-title" class="header-title">Dokumenty</span>
+      </div>
+      <div class="header-right">
+        <div id="chatbot" aria-label="Asystent" title="Asystent" onclick="window.location.href='assistant.html'" style="cursor: pointer;">
+          <svg
+            class="chatbot-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            role="img"
+            aria-hidden="true"
+          >
+            <path
+              fill="currentColor"
+              d="M10,11C10,11.552 9.552,12 9,12C8.448,12 8,11.552 8,11C8,10.448 8.448,10 9,10C9.552,10 10,10.448 10,11Z"
+            ></path>
+            <path
+              fill="currentColor"
+              d="M15,12C15.552,12 16,11.552 16,11C16,10.448 15.552,10 15,10C14.448,10 14,10.448 14,11C14,11.552 14.448,12 15,12Z"
+            ></path>
+            <path
+              fill="currentColor"
+              fill-rule="evenodd"
+              d="M7.5,3.75C7.5,3.336 7.836,3 8.25,3C8.664,3 9,3.336 9,3.75V5H15V3.75C15,3.336 15.336,3 15.75,3C16.164,3 16.5,3.336 16.5,3.75V5.031C18.225,5.246 19.609,6.56 19.93,8.25H20.5C21.881,8.25 23,9.369 23,10.75V12.25C23,13.631 21.881,14.75 20.5,14.75H19.93C19.579,16.601 17.953,18 16,18H9.657C8.596,18 7.579,18.421 6.828,19.172L5.707,20.293C5.077,20.923 4,20.477 4,19.586V14.75H3.5C2.119,14.75 1,13.631 1,12.25V10.75C1,9.369 2.119,8.25 3.5,8.25H4.07C4.07,8.25 4.07,8.25 4.07,8.25C4.391,6.56 5.775,5.246 7.5,5.031V3.75ZM4,9.75H3.5C2.948,9.75 2.5,10.198 2.5,10.75V12.25C2.5,12.802 2.948,13.25 3.5,13.25H4V9.75ZM20,13.25V9.75H20.5C21.052,9.75 21.5,10.198 21.5,10.75V12.25C21.5,12.802 21.052,13.25 20.5,13.25H20ZM16,6.5H8C6.619,6.5 5.5,7.619 5.5,9V18.379L5.768,18.111C6.799,17.08 8.198,16.5 9.657,16.5H16C17.381,16.5 18.5,15.381 18.5,14V9C18.5,7.619 17.381,6.5 16,6.5Z"
+            ></path>
+          </svg>
+        </div>
+        <div id="dzwonek" aria-label="Powiadomienia" title="Powiadomienia">
+          <svg
+            class="notif-bell"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            role="img"
+            aria-hidden="true"
+          >
+            <path
+              fill="currentColor"
+              d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"
+            ></path>
+            <circle
+              id="red-dot"
+              cx="18"
+              cy="6"
+              r="4"
+              fill="#cd291c"
+            ></circle>
+          </svg>
+        </div>
+      </div>
+    </header>
+    <h2 id="main-title" class="dashboard-section-title dashboard-main-content">
+      Dokumenty
+    </h2>
+    <section id="wybor-p">
+      <div id="cards-container"></div>
+      <div class="dashboard-under-card">
+        <a href="widok.html" id="customize-view-btn" class="customize-view-link"
+          >Dostosuj widok</a
+        >
+      </div>
+    </section>
+    <button
+      class="floating-add-doc-btn"
+      type="button"
+      aria-label="Dodaj dokument"
+      id="add-doc-btn"
+    >
+      <span class="icon-plus" aria-hidden="true">+</span>
+      <span>Dodaj dokument</span>
+    </button>
+
+    <div id="add-doc-overlay" class="overlay" style="display: none">
+      <div class="overlay-backdrop"></div>
+      <div class="overlay-panel">
+        <div class="overlay-handle"></div>
+        <h2 class="overlay-title">Dodaj dokument</h2>
+        <div class="overlay-content">
+          <div class="doc-option">
+            <label class="doc-checkbox">
+              <input type="checkbox" data-doc-id="mdowod" />
+              <span class="checkmark"></span>
+              <span class="doc-label">mDowód</span>
+            </label>
+          </div>
+          <div class="doc-option">
+            <label class="doc-checkbox">
+              <input type="checkbox" data-doc-id="mdowod2" />
+              <span class="checkmark"></span>
+              <span class="doc-label">Moje pojazdy</span>
+            </label>
+          </div>
+          <div class="doc-option">
+            <label class="doc-checkbox">
+              <input type="checkbox" data-doc-id="mdowod3" />
+              <span class="checkmark"></span>
+              <span class="doc-label">Legitymacja osoby niepełnosprawnej</span>
+            </label>
+          </div>
+          <div class="doc-option">
+            <label class="doc-checkbox">
+              <input type="checkbox" data-doc-id="mdowod4" />
+              <span class="checkmark"></span>
+              <span class="doc-label">Legitymacja radcy prawnego</span>
+            </label>
+          </div>
+          <div class="doc-option">
+            <label class="doc-checkbox">
+              <input type="checkbox" data-doc-id="diia" />
+              <span class="checkmark"></span>
+              <span class="doc-label">Diia.pl</span>
+            </label>
+          </div>
+          <div class="doc-option">
+            <label class="doc-checkbox">
+              <input type="checkbox" data-doc-id="legszk" />
+              <span class="checkmark"></span>
+              <span class="doc-label">Legitymacja szkolna</span>
+            </label>
+          </div>
+          <div class="doc-option">
+            <label class="doc-checkbox">
+              <input type="checkbox" data-doc-id="legstu" />
+              <span class="checkmark"></span>
+              <span class="doc-label">Legitymacja studencka</span>
+            </label>
+          </div>
+          <div class="doc-option">
+            <label class="doc-checkbox">
+              <input type="checkbox" data-doc-id="prawojazdy" />
+              <span class="checkmark"></span>
+              <span class="doc-label">Prawo jazdy</span>
+            </label>
+          </div>
+        </div>
+        <button class="overlay-close-btn" id="close-add-overlay">Gotowe</button>
+      </div>
+    </div>
+
+    <div id="customize-overlay" class="overlay" style="display: none">
+      <div class="overlay-backdrop"></div>
+      <div class="overlay-panel">
+        <div class="overlay-handle"></div>
+        <h2 class="overlay-title">Dostosuj widok</h2>
+        <div class="overlay-content">
+          <p class="overlay-hint">
+            Przeciągnij, aby zmienić kolejność dokumentów
+          </p>
+          <div id="sortable-cards" class="sortable-list"></div>
+        </div>
+        <button class="overlay-close-btn" id="close-customize-overlay">
+          Gotowe
+        </button>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="bottom-nav__tab bottom-nav__tab--active">
+        <img src="assets/icons/if006_documents_fill.svg" alt="home.html" />
+        <span class="bottom-nav__active-text">Dokumenty</span>
+      </div>
+      <div
+        class="bottom-nav__tab unfill"
+        onclick="window.location.href = 'services.html'"
+      >
+        <img src="assets/icons/if002_services.svg" alt="services.html" />
+        <span>Usługi</span>
+      </div>
+      <div
+        class="bottom-nav__tab unfill"
+        onclick="window.location.href = 'qr.html'"
+      >
+        <img src="assets/icons/if004_scan.svg" alt="qr.html" />
+        <span>Kod QR</span>
+      </div>
+      <div
+        class="bottom-nav__tab unfill"
+        onclick="window.location.href = 'more.html'"
+      >
+        <img src="assets/icons/if005_more.svg" alt="more.html" />
+        <span>Więcej</span>
+      </div>
+    </div>
+
+    <div id="license-modal" class="custom-modal" style="display: none;">
+      <div class="custom-modal-backdrop" id="close-license-backdrop"></div>
+      <div class="custom-modal-content">
+        <h3 id="notif-title">Powiadomienie</h3>
+        <p id="notif-message">Brak nowych powiadomień.</p>
+        <div class="modal-buttons">
+          <button id="close-license-btn" class="custom-modal-btn">Zamknij</button>
+          <button id="reset-license-btn" class="custom-modal-btn custom-modal-btn-secondary">Resetuj powiadomienia</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="triple-click-menu" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; color: #ffffff; padding: 20px; border-radius: 10px; z-index: 10000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); max-width: 300px; text-align: center;">
+      <h3 style="margin-top: 0; color: #ffffff;">Informacje o aplikacji</h3>
+      <p id="app-version" style="margin: 10px 0;">Wersja aplikacji: sObywatel 4.0</p>
+      <p id="license-key" style="margin: 10px 0;">Klucz licencyjny: <span id="license-key-value">Nie ustawiony</span></p>
+      <p id="activation-date" style="margin: 10px 0;">Data aktywacji: <span id="activation-date-value">Nie ustawiona</span></p>
+      <button id="close-menu" style="margin-top: 15px; padding: 10px 20px; background: #dc3545; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Zamknij</button>
+    </div>
+
+    <script>
+      // --- Funkcja do wysyłania powiadomień ---
+      window.wyslijPowiadomienie = function(tytul, tresc) {
+        const tytulElement = document.getElementById('notif-title');
+        const trescElement = document.getElementById('notif-message');
+        const kropka = document.getElementById('red-dot');
+
+        if (tytulElement) tytulElement.innerText = tytul;
+        if (trescElement) trescElement.innerHTML = tresc;
+
+        if (kropka) {
+          kropka.style.opacity = '1';
+        }
+
+        localStorage.setItem('licenseRead', 'false');
+      };
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const dzwonekBtn = document.getElementById('dzwonek');
+        const licenseModal = document.getElementById('license-modal');
+        const closeBtn = document.getElementById('close-license-btn');
+        const resetBtn = document.getElementById('reset-license-btn');
+        const backdrop = document.getElementById('close-license-backdrop');
+        const redDot = document.getElementById('red-dot');
+
+        if (redDot) {
+          redDot.style.transition = 'opacity 0.2s ease-in-out';
+        }
+
+        if (localStorage.getItem('licenseRead') === 'true' && redDot) {
+          redDot.style.opacity = '0';
+        } else if (redDot) {
+          redDot.style.opacity = '1';
+        }
+
+        if (dzwonekBtn && licenseModal) {
+          dzwonekBtn.addEventListener('click', function() {
+            licenseModal.style.display = 'flex';
+            
+            if (redDot) {
+              redDot.style.opacity = '0';
+              localStorage.setItem('licenseRead', 'true');
+            }
+          });
+        }
+
+        if (closeBtn && licenseModal) {
+          closeBtn.addEventListener('click', function() {
+            licenseModal.style.display = 'none';
+          });
+        }
+
+        if (resetBtn && licenseModal) {
+          resetBtn.addEventListener('click', function() {
+            if (redDot) {
+              redDot.style.opacity = '1';
+              localStorage.setItem('licenseRead', 'false');
+            }
+            licenseModal.style.display = 'none';
+          });
+        }
+
+        if (backdrop && licenseModal) {
+          backdrop.addEventListener('click', function() {
+            licenseModal.style.display = 'none';
+          });
+        }
+      });
+
+      // --- SYSTEM POBIERANIA POWIADOMIEŃ Z ZEWNĘTRZNEGO SERWERA ---
+      function sprawdzPowiadomieniaZSerwera() {
+        // TUTAJ PODMIEŃ NA ADRES SWOJEGO DRUGIEGO SERWERA
+        const urlPowiadomienia = 'https://sobywatel.net/api.php?t=' + new Date().getTime(); 
+
+        fetch(urlPowiadomienia)
+          .then(response => response.json())
+          .then(dane => {
+            const ostatnieId = localStorage.getItem('ostatnieIdPowiadomienia');
+
+            if (dane && dane.id && String(dane.id) !== ostatnieId) {
+              window.wyslijPowiadomienie(dane.tytul, dane.tresc);
+              localStorage.setItem('ostatnieIdPowiadomienia', String(dane.id));
+            }
+          })
+          .catch(error => {
+            // Ciche ignorowanie błędu, np. w razie braku zasięgu
+          });
+      }
+
+      sprawdzPowiadomieniaZSerwera();
+      setInterval(sprawdzPowiadomieniaZSerwera, 15000);
+    </script>
+
+    <script>
+      // Triple-click menu for logo
+      let clickCount = 0;
+      const logoImg = document.getElementById('logo-img');
+      const menu = document.getElementById('triple-click-menu');
+      const button1 = document.getElementById('button1');
+      const button2 = document.getElementById('button2');
+      const closeMenu = document.getElementById('close-menu');
+
+      logoImg.addEventListener('click', function() {
+        clickCount++;
+        setTimeout(() => {
+          clickCount = 0;
+        }, 500); // Reset after 500ms
+
+        if (clickCount === 3) {
+          // Update menu content with data
+          const licenseKey = localStorage.getItem('licenseKey') || 'Nie ustawiony';
+          const activationDate = localStorage.getItem('activationDate') || 'Nie ustawiona';
+          document.getElementById('license-key-value').textContent = licenseKey;
+          document.getElementById('activation-date-value').textContent = activationDate;
+
+          menu.style.display = 'block';
+          clickCount = 0;
+        }
+      });
+
+      closeMenu.addEventListener('click', function() {
+        menu.style.display = 'none';
+      });
+
+      // Close menu on backdrop click
+      document.addEventListener('click', function(event) {
+        if (event.target === menu) {
+          menu.style.display = 'none';
+        }
+      });
+    </script>
+  </body>
+</html>

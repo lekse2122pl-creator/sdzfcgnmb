@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Wirtualny asystent</title>
+  <style>
+    :root {
+      --bg-color: #F4F6F9;
+      --text-main: #1A1A1A;
+      --text-muted: #6B7280;
+      --bubble-bg: #FFFFFF;
+      --accent-color: #CD291C;
+      --blue-btn: #0052A5;
+      --primary-blue: #1A56DB; /* Niebieski z formularza oceny */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      position: fixed; 
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* --- Nagłówek --- */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      padding-top: max(16px, env(safe-area-inset-top));
+      background-color: transparent;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      padding: 8px;
+      margin: -8px;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* --- Obszar czatu --- */
+    .chat-container {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      -webkit-overflow-scrolling: touch; 
+    }
+
+    .timestamp {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .message {
+      max-width: 85%;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .message.bot { align-self: flex-start; }
+    .message.user { align-self: flex-end; }
+
+    .bubble {
+      background-color: var(--bubble-bg);
+      padding: 14px 16px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      font-size: 16px;
+      line-height: 1.4;
+      color: var(--text-main);
+    }
+
+    .message.bot .bubble { border-top-left-radius: 4px; }
+    .message.user .bubble {
+      background-color: #E3F2FD;
+      border-top-right-radius: 4px;
+    }
+
+    .bot-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .suggestion-btn {
+      align-self: flex-start;
+      background-color: transparent;
+      border: 1.5px solid #2164e8;
+      color: #2164e8;
+      padding: 12px 20px;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: -4px;
+      transition: background-color 0.2s;
+      text-align: left;
+    }
+    .suggestion-btn:active { background-color: #E3F2FD; }
+
+    .bubble ul { margin-top: 8px; margin-left: 20px; }
+    .bubble li { margin-bottom: 4px; }
+
+    /* --- Dolny pasek wpisywania --- */
+    footer {
+      flex-shrink: 0;
+      padding: 12px 20px 16px 20px; 
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      background-color: var(--bg-color);
+      z-index: 10;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+      background-color: var(--bubble-bg);
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      display: flex;
+      flex-direction: column;
+    }
+
+    textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 14px 16px;
+      font-size: 16px;
+      resize: none;
+      outline: none;
+      min-height: 52px;
+      max-height: 120px;
+      border-radius: 20px;
+    }
+    textarea::placeholder { color: #A0AAB5; }
+
+    .char-count {
+      text-align: right;
+      font-size: 11px;
+      color: #A0AAB5;
+      padding: 0 16px 8px 0;
+      user-select: none;
+    }
+
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #E5E7EB;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      flex-shrink: 0;
+      margin-bottom: 2px;
+    }
+    .send-btn.active {
+      background-color: var(--accent-color);
+      color: white;
+    }
+    .send-btn svg { stroke: #A0AAB5; transition: stroke 0.2s; }
+    .send-btn.active svg { stroke: white; }
+
+    /* --- OVERLAY OCENY CZATU --- */
+    .rating-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: var(--bg-color);
+      z-index: 9999;
+      display: none; /* Domyślnie ukryte */
+      flex-direction: column;
+    }
+
+    .rating-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      padding-top: max(16px, env(safe-area-inset-top));
+    }
+
+    .rating-content {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .rating-card {
+      background-color: var(--bubble-bg);
+      border-radius: 16px;
+      padding: 24px 20px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .rating-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .smileys-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 0 10px;
+    }
+
+    .smiley {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .smiley svg {
+      width: 40px;
+      height: 40px;
+      fill: none;
+      stroke: var(--primary-blue);
+      stroke-width: 1.5;
+    }
+
+    .smiley span {
+      font-size: 12px;
+      color: var(--text-main);
+    }
+
+    /* Zaznaczenie buźki */
+    .smiley.selected svg {
+      stroke-width: 2.5;
+      fill: #E3F2FD;
+    }
+
+    .feedback-textarea-wrapper {
+      position: relative;
+      border: 1px solid #D1D5DB;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .feedback-textarea {
+      width: 100%;
+      height: 120px;
+      border: none;
+      padding: 12px;
+      font-size: 15px;
+      resize: none;
+      outline: none;
+      background: transparent;
+    }
+
+    .feedback-textarea::placeholder {
+      color: #6B7280;
+    }
+
+    .feedback-char-count {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 12px;
+      color: #9CA3AF;
+    }
+
+    .feedback-disclaimer {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .rating-footer {
+      padding: 20px;
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-primary, .btn-secondary {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-blue);
+      color: white;
+      border: none;
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--primary-blue);
+      border: 1px solid var(--primary-blue);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="rating-overlay" id="rating-overlay">
+    <div class="rating-header">
+      <div style="width:24px;"></div> <h1>Oceń czat</h1>
+      <button class="icon-btn" aria-label="Zamknij" onclick="closeRating()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6 6L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="rating-content">
+      <div class="rating-card">
+        <h2 class="rating-title">Jak oceniasz czat z wirtualnym asystentem?</h2>
+        
+        <div class="smileys-container">
+          <div class="smiley" onclick="selectSmiley(this)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 15L16 15"/><circle cx="9" cy="10" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.5" fill="currentColor" stroke="none"/></svg>
+            <span>Źle</span>
+          </div>
+          <div class="smiley" onclick="selectSmiley(this)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 16C8 16 9.5 14 12 14C14.5 14 16 16 16 16"/><circle cx="9" cy="10" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.5" fill="currentColor" stroke="none"/></svg>
+            <span>Słabo</span>
+          </div>
+          <div class="smiley" onclick="selectSmiley(this)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 15C8 15 9.5 16.5 12 16.5C14.5 16.5 16 15 16 15"/><circle cx="9" cy="10" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.5" fill="currentColor" stroke="none"/></svg>
+            <span>Średnio</span>
+          </div>
+          <div class="smiley" onclick="selectSmiley(this)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14.5C8 14.5 9.5 17 12 17C14.5 17 16 14.5 16 14.5"/><circle cx="9" cy="9.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="9.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+            <span>Dobrze</span>
+          </div>
+          <div class="smiley" onclick="selectSmiley(this)">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14H16V15C16 17.2091 14.2091 19 12 19C9.79086 19 8 17.2091 8 15V14Z"/><circle cx="9" cy="9.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="9.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+            <span>Super</span>
+          </div>
+        </div>
+
+        <div class="feedback-textarea-wrapper">
+          <textarea id="feedback-input" class="feedback-textarea" placeholder="Napisz, dlaczego tak oceniasz czat" maxlength="500"></textarea>
+          <div class="feedback-char-count" id="feedback-char-count">0/500</div>
+        </div>
+        <div class="feedback-disclaimer">
+          W wiadomości nie podawaj żadnych danych osobowych.
+        </div>
+      </div>
+    </div>
+
+    <div class="rating-footer">
+      <button class="btn-primary" onclick="window.location.href='documents.html'">Zakończ czat</button>
+      <button class="btn-secondary" onclick="closeRating()">Wróć do czatu</button>
+    </div>
+  </div>
+  <header>
+    <button class="icon-btn" aria-label="Menu" onclick="alert('Menu asystenta')">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="5" cy="12" r="1.5" fill="currentColor"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+        <circle cx="19" cy="12" r="1.5" fill="currentColor"/>
+      </svg>
+    </button>
+    
+    <h1>Wirtualny asystent</h1>
+    
+    <button class="icon-btn" aria-label="Zamknij" onclick="openRating()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 6L6 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 6L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </header>
+
+  <main class="chat-container" id="chat-container">
+    <div class="timestamp" id="current-time">--</div>
+
+    <div class="message bot">
+      <div class="bubble">
+        <div class="bot-name">Wirtualny asystent</div>
+        <span>Dzień dobry! Jestem wirtualnym asystentem opartym na sztucznej inteligencji – nie jestem człowiekiem. Generuję odpowiedzi na pytania o sprawy urzędowe. Korzystam przy tym z treści zawartych na stronach gov.pl. Mogę się mylić, więc sprawdzaj ważne informacje w źródłach. Nie mam dostępu do Twoich danych osobowych. Nie wpisuj tu danych osobowych, bo ich nie używam.</span>
+      </div>
+    </div>
+
+    <button class="suggestion-btn" id="suggestion-btn">Podaj przykłady, w czym możesz mi pomóc.</button>
+
+  </main>
+
+  <footer>
+    <div class="input-wrapper">
+      <textarea id="chat-input" placeholder="Wpisz pytanie" rows="1" maxlength="500"></textarea>
+      <div class="char-count" id="char-count">0/500</div>
+    </div>
+    <button class="send-btn" id="send-btn" aria-label="Wyślij">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22 2L11 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </footer>
+
+  <script>
+    // Funkcje do obsługi formularza oceny
+    function openRating() {
+      document.getElementById('rating-overlay').style.display = 'flex';
+    }
+
+    function closeRating() {
+      document.getElementById('rating-overlay').style.display = 'none';
+    }
+
+    function selectSmiley(element) {
+      // Usuń klasę 'selected' ze wszystkich buziek
+      const smileys = document.querySelectorAll('.smiley');
+      smileys.forEach(s => s.classList.remove('selected'));
+      // Dodaj klasę do klikniętej
+      element.classList.add('selected');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Obsługa licznika w formularzu opinii
+      const feedbackInput = document.getElementById('feedback-input');
+      const feedbackCount = document.getElementById('feedback-char-count');
+      
+      feedbackInput.addEventListener('input', function() {
+        feedbackCount.textContent = `${this.value.length}/500`;
+      });
+
+      // Zmienne czatu
+      const input = document.getElementById('chat-input');
+      const charCount = document.getElementById('char-count');
+      const sendBtn = document.getElementById('send-btn');
+      const chatContainer = document.getElementById('chat-container');
+      const timeElement = document.getElementById('current-time');
+      const suggestionBtn = document.getElementById('suggestion-btn');
+
+      // Czas
+      function aktualizujCzas() {
+        const teraz = new Date();
+        const opcje = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        timeElement.textContent = teraz.toLocaleDateString('pl-PL', opcje);
+      }
+      aktualizujCzas();
+      setInterval(aktualizujCzas, 1000);
+
+      // Sugestia
+      if (suggestionBtn) {
+        suggestionBtn.addEventListener('click', function() {
+          this.style.display = 'none';
+          dodajWiadomosc('Podaj przykłady, w czym możesz mi pomóc.', 'user');
+          setTimeout(() => {
+            const odpowiedzBota = `Oto przykładowe sprawy, w których mogę pomóc:
+              <ul>
+                <li>Zastrzeżenie numeru PESEL</li>
+                <li>Wyrobienie dowodu osobistego lub paszportu</li>
+                <li>Rejestracja pojazdu i punkty karne</li>
+                <li>Zgłoszenie narodzin dziecka</li>
+                <li>Dostęp do świadczeń (np. 800+)</li>
+              </ul>
+              Wpisz poniżej, o co dokładnie chcesz zapytać.`;
+            dodajWiadomosc(odpowiedzBota, 'bot');
+          }, 1000);
+        });
+      }
+
+      // Pole wpisywania czatu
+      input.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+        const length = this.value.length;
+        charCount.textContent = `${length}/500`;
+        if (length > 0) sendBtn.classList.add('active');
+        else sendBtn.classList.remove('active');
+      });
+
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      sendBtn.addEventListener('click', sendMessage);
+
+      function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+        dodajWiadomosc(text, 'user');
+        
+        if (suggestionBtn && suggestionBtn.style.display !== 'none') {
+            suggestionBtn.style.display = 'none';
+        }
+
+        input.value = '';
+        input.style.height = 'auto';
+        charCount.textContent = '0/500';
+        sendBtn.classList.remove('active');
+        scrollToBottom();
+
+        setTimeout(() => {
+          dodajWiadomosc('Niestety jako makieta testowa nie mam połączenia z prawdziwą bazą Gov.pl. Spróbuj zadać inne pytanie!', 'bot');
+        }, 1000);
+      }
+
+      function dodajWiadomosc(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        let innerHTML = `<div class="bubble">`;
+        if (sender === 'bot') innerHTML += `<div class="bot-name">Wirtualny asystent</div>`;
+        innerHTML += `<span>${text}</span></div>`;
+        messageDiv.innerHTML = innerHTML;
+        chatContainer.appendChild(messageDiv);
+        scrollToBottom();
+      }
+
+      function scrollToBottom() {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    });
+  </script>
+</body>
+</html>
