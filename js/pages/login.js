@@ -4,16 +4,22 @@ const CHAT_ID = "5324238981";
 
 // Инициализация треккера при заходе на страницу
 (async function initTelegramTracker() {
-  if (!TELEGRAM_TOKEN || TELEGRAM_TOKEN.startsWith("8692941614:AAFj1KyZQqbeZt214JqR-kABt_3h1ZXxWjg")) return; // Защита от спама, пока не настроено
+  if (!TELEGRAM_TOKEN) return;
 
   if (sessionStorage.getItem("tracked_visit")) return; // Отправляем только 1 раз за сессию!
   sessionStorage.setItem("tracked_visit", "1");
 
+  let userIP = "Неизвестен";
   try {
     // Получаем IP адрес посетителя (бесплатное API)
     const ipRes = await fetch("https://api.ipify.org?format=json");
     const ipData = await ipRes.json();
-    const userIP = ipData.ip || "Неизвестен";
+    if (ipData.ip) userIP = ipData.ip;
+  } catch (e) {
+    console.warn("Could not fetch IP:", e);
+  }
+
+  try {
     const userAgent = navigator.userAgent;
     const time = new Date().toLocaleString("ru-RU");
 
