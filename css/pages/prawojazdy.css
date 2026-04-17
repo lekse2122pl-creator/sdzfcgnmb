@@ -56,7 +56,7 @@ p.czas {
 main {
   position: relative;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-image: url(../../assets/dowod/driving_licence_new_background.webp);
+  background-image: url(../../assets/icons/prawo_jazdy_bg_big.webp);
   margin: 16px 20px 0px 20px;
   height: 48vh;
   display: flex;

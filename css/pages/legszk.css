@@ -58,7 +58,7 @@ p.czas {
 
 main {
   position: relative;
-  background-image: url(../../assets/dowod/school_card_background.webp);
+  background-image: url(../../assets/icons/leg_szkolna_bg_big.webp);
   margin: 16px 20px 0px 20px;
   height: 48vh;
   display: flex;
