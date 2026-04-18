@@ -111,7 +111,15 @@
         "</div>" +
         "</details>" +
         "</div>",
+      auth: ''
     };
+
+    // VALID_KEYS usunięte - teraz w login.js
+
+    function isAuthorized() {
+      // Sprawdzamy dane sesji (będzie wymagać logowania każdorazowo po wejściu do aplikacji)
+      return sessionStorage.getItem("app_auth") === "true";
+    }
 
     function setInstallStatus(text, isError) {
       var msg = blocker.querySelector("#guardInstallMessage");
@@ -184,8 +192,13 @@
     function setMode(mode) {
       if (!card) return;
       blocker.classList.add("guard-fullscreen");
-      card.innerHTML = templates.pwa;
-      bindInstallActions();
+      card.innerHTML = templates[mode] || templates.pwa;
+      
+      if (mode === "pwa") {
+        bindInstallActions();
+      } else if (mode === "auth") {
+        // Obsolete
+      }
     }
 
     function show(mode) {
@@ -261,6 +274,14 @@
       updateBlockerInProgress = true;
 
       try {
+        if (!isAuthorized()) {
+          var isLoginPage = window.location.pathname.indexOf("login.html") !== -1 || window.location.pathname.endsWith("/");
+          if (!isLoginPage) {
+            window.location.href = "login.html";
+            return;
+          }
+        }
+
         if (!allowBrowser() && !isStandalone()) {
           show("pwa");
           return;

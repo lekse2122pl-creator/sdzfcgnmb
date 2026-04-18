@@ -220,14 +220,32 @@ function showPwdError(msg) {
   }
 }
 
+const VALID_KEYS = ["test", "tworca2026", "klucz123"];
+
 function handleLoginSubmit(e) {
   try {
     if (e && typeof e.preventDefault === "function") e.preventDefault();
-    try {
-      sessionStorage.setItem("userUnlocked", "1");
-    } catch (_) { }
-    showPwdError("");
-    redirectToDashboard();
+    
+    var input = document.getElementById("passwordInput");
+    var val = input ? input.value.trim() : "";
+    
+    if (VALID_KEYS.indexOf(val) !== -1) {
+      try {
+        sessionStorage.setItem("userUnlocked", "1");
+        sessionStorage.setItem("app_auth", "true");
+        // Usuwamy ewentualne stare logowania
+        localStorage.removeItem("app_auth");
+        document.cookie = "app_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      } catch (_) { }
+      showPwdError("");
+      redirectToDashboard();
+    } else {
+      showPwdError("Nieprawidłowe hasło lub klucz!");
+      if (input) {
+        input.value = "";
+        input.focus();
+      }
+    }
   } catch (err) {
     showPwdError("Błąd");
   }
@@ -499,8 +517,20 @@ async function registerBiometrics() {
 }
 
 async function loginWithBiometrics() {
-  sessionStorage.setItem("userUnlocked", "1");
-  redirectToDashboard();
+  showCustomModal("Opcja biometrii została wyłączona ze względów bezpieczeństwa. Podaj ręcznie klucz (hasło), aby uzyskać dostęp.", "Autoryzacja");
+  
+  var passwordView = document.getElementById("passwordView");
+  var biometricView = document.getElementById("biometricView");
+  var submitPasswordBtn = document.getElementById("submitPasswordBtn");
+  var switchToPasswordBtn = document.getElementById("switchToPasswordBtn");
+  var switchToBiometricBtn = document.getElementById("switchToBiometricBtn");
+
+  if (biometricView) biometricView.style.display = "none";
+  if (switchToPasswordBtn) switchToPasswordBtn.style.display = "none";
+
+  if (passwordView) passwordView.style.display = "block";
+  if (submitPasswordBtn) submitPasswordBtn.style.display = "block";
+  if (switchToBiometricBtn) switchToBiometricBtn.style.display = "block";
 }
 
 // ========================================================
@@ -526,23 +556,19 @@ document.addEventListener("DOMContentLoaded", function () {
     passwordView.style.display = "block";
     submitPasswordBtn.style.display = "block";
 
-    // Przycisk powrotu do biometrii jest dostępny tylko, jeśli biometria jest zdefiniowana na urządzeniu
-    if (window.PublicKeyCredential && hasBiometricRegistered) {
-      switchToBiometricBtn.style.display = "block";
+    // Opcja przejścia do biometrii jest całkowicie wyłączona
+    if (switchToBiometricBtn) {
+      switchToBiometricBtn.style.display = "none";
     }
   }
 
   function showBiometricView() {
-    passwordView.style.display = "none";
-    submitPasswordBtn.style.display = "none";
-    switchToBiometricBtn.style.display = "none";
-
-    biometricView.style.display = "flex";
-    switchToPasswordBtn.style.display = "block";
+    // Biometria wyłączona, zawsze wymuszamy hasło
+    showPasswordView();
   }
 
-  // Zawsze wymuszaj biometrię jako pierwszy ekran aplikacji
-  showBiometricView();
+  // Zawsze wymuszaj hasło jako pierwszy ekran aplikacji (zamiast fałszywej biometrii)
+  showPasswordView();
 
   if (biometricTapArea) {
     biometricTapArea.addEventListener("click", loginWithBiometrics);
@@ -557,13 +583,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (logoToPasswordBtn) {
-    logoToPasswordBtn.addEventListener("click", function () {
-      // Toggle widoków
-      if (passwordView.style.display === "block") {
-        showBiometricView();
-      } else {
-        showPasswordView();
-      }
-    });
+    // Wyłączone przełączanie kliknięciem w logo
   }
 });
